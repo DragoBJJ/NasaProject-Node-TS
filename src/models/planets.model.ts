@@ -11,6 +11,10 @@ const isHabitablePlanets = (planet: any) => {
 
 const habitablePlanets: string[] = [];
 
+export const getPlanetsData = () => {
+  return habitablePlanets;
+};
+
 const loadPlanetsData = () => {
   return new Promise((resolve, reject) => {
     fs.createReadStream(
@@ -19,12 +23,11 @@ const loadPlanetsData = () => {
       .pipe(
         parse({
           comment: "#",
-          columns: true
+          columns: true,
         })
       )
       .on("data", (data: any) => {
         if (isHabitablePlanets(data)) {
-          console.log("PLANET", data);
           habitablePlanets.push(data);
         }
       })
@@ -40,5 +43,5 @@ const loadPlanetsData = () => {
 
 export default {
   habitablePlanets,
-  loadPlanetsData
+  loadPlanetsData,
 };

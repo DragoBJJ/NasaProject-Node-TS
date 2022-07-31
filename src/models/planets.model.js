@@ -8,16 +8,18 @@ const isHabitablePlanets = (planet) => {
     return I && II && III;
 };
 const habitablePlanets = [];
+export const getPlanetsData = () => {
+    return habitablePlanets;
+};
 const loadPlanetsData = () => {
     return new Promise((resolve, reject) => {
         fs.createReadStream(path.join(path.resolve(), "..", "server", "data", "kepler_data.csv"))
             .pipe(parse({
             comment: "#",
-            columns: true
+            columns: true,
         }))
             .on("data", (data) => {
             if (isHabitablePlanets(data)) {
-                console.log("PLANET", data);
                 habitablePlanets.push(data);
             }
         })
@@ -32,5 +34,5 @@ const loadPlanetsData = () => {
 };
 export default {
     habitablePlanets,
-    loadPlanetsData
+    loadPlanetsData,
 };
