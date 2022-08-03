@@ -8,7 +8,8 @@
     "test-watch": "jest --watch",
     "build": "npx tsc",
     "start": "node --experimental-modules --es-module-specifier-resolution=node src/index.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon --experimental-modules --es-module-specifier-resolution=node src/index.js\""
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon --experimental-modules --es-module-specifier-resolution=node src/index.js\"",
+    "cluster": "pm2 start src/index.js -i max"
   },
   "author": "Jakub",
   "license": "ISC",
@@ -17,7 +18,8 @@
     "cors": "^2.8.5",
     "csv-parse": "^5.0.4",
     "express": "^4.17.3",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "pm2": "^5.2.0"
   },
   "keywords": [],
   "description": "",
