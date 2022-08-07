@@ -2,6 +2,15 @@ import { parse } from "csv-parse";
 import path from "path";
 import fs from "fs";
 
+import { PlanetModel } from "./planets.mongo";
+
+type PlanetType = {
+  kepler_name: string;
+  koi_disposition: string;
+  koi_insol: number;
+  koi_prad: number;
+};
+
 const isHabitablePlanets = (planet: any) => {
   const I = planet["koi_disposition"] === "CONFIRMED";
   const II = planet["koi_insol"] > 0.36 && planet["koi_insol"] < 1.11;
@@ -9,10 +18,22 @@ const isHabitablePlanets = (planet: any) => {
   return I && II && III;
 };
 
-const habitablePlanets: string[] = [];
+export const getPlanetsData = async () => {
+  return await PlanetModel.find({});
+};
 
-export const getPlanetsData = () => {
-  return habitablePlanets;
+const savePlanet = async (planet: any) => {
+  try {
+    await PlanetModel.updateOne(
+      {
+        keplerName: planet.kepler_name,
+      },
+      { keplerName: planet.kepler_name },
+      { upsert: true }
+    );
+  } catch (error) {
+    console.log("Error", error);
+  }
 };
 
 const loadPlanetsData = () => {
@@ -26,22 +47,23 @@ const loadPlanetsData = () => {
           columns: true,
         })
       )
-      .on("data", (data: any) => {
+      .on("data", async (data: any) => {
         if (isHabitablePlanets(data)) {
-          habitablePlanets.push(data);
+          savePlanet(data);
         }
       })
       .on("error", (err: Error) => {
         console.log("err", err);
         reject(err);
       })
-      .on("end", (result: unknown) => {
+      .on("end", async (result: unknown) => {
+        const planetsLength = (await getPlanetsData()).length;
+        console.log(`Our planets length ${planetsLength}`);
         resolve(result);
       });
   });
 };
 
 export default {
-  habitablePlanets,
   loadPlanetsData,
 };

@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
 import {
   getAllLaunchesModel,
-  createNewLaunch,
   existsLaunch,
-  Launch,
   abordLaunchByID,
+  createNewLaunch,
+  Launch,
 } from "../../models/launches.model";
 import { handleError } from "../../utils";
 
-export const getAllLaunches = (req: Request, res: Response) => {
-  return res.status(200).json(getAllLaunchesModel());
+export const getAllLaunches = async (req: Request, res: Response) => {
+  return res.status(200).json(await getAllLaunchesModel());
 };
 
-export const addNewLaunch = (req: Request, res: Response) => {
+export const addNewLaunch = async (req: Request, res: Response) => {
   const newLaunch: Launch = req.body;
   if (handleError(newLaunch)) {
     return res.status(400).json({
@@ -25,21 +25,21 @@ export const addNewLaunch = (req: Request, res: Response) => {
       error: "Invalid launch Date",
     });
   }
-  createNewLaunch(newLaunch);
+  await createNewLaunch(newLaunch);
   return res.status(201).json(newLaunch);
 };
 
-export const abordLaunch = (req: Request, res: Response) => {
+export const abordLaunch = async (req: Request, res: Response) => {
   const launchID = +req.params.id;
-  if (!existsLaunch(launchID)) {
+  if (!(await existsLaunch(launchID))) {
     return res.status(404).json({
       error: "Launch not found",
     });
   }
-  const abordedLaunch = abordLaunchByID(launchID);
+  const abordedLaunch = await abordLaunchByID(launchID);
   if (!abordedLaunch) {
-    return res.status(404).json({
-      error: "Launch not found",
+    return res.status(400).json({
+      error: "Launch not aborted",
     });
   }
   return res.status(200).json(abordedLaunch);

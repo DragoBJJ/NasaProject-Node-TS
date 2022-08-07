@@ -1,4 +1,5 @@
-const launches = new Map();
+import { LaunchesModel } from "./launches.mongo";
+import { PlanetModel } from "./planets.mongo";
 const launch = {
     flightNumber: 100,
     mission: "Kepler Exploration X",
@@ -9,24 +10,48 @@ const launch = {
     upcoming: true,
     success: true,
 };
-let latestFlightNumber = 100;
-launches.set(launch.flightNumber, launch);
-export const getAllLaunchesModel = () => {
-    return Array.from(launches.values());
+const DEFAULT_FLIGHT_NUMBER = 100;
+const saveLaunch = async (launch) => {
+    const planet = await PlanetModel.findOne({
+        keplerName: launch.target,
+    });
+    if (!planet)
+        throw new Error("No matching planet found");
+    await LaunchesModel.findOneAndUpdate({ flightNumber: launch.flightNumber }, launch, {
+        upsert: true,
+    });
 };
-export const createNewLaunch = (launch) => {
-    latestFlightNumber++;
-    const newLauch = Object.assign(Object.assign({}, launch), { flightNumber: latestFlightNumber, success: true, upcoming: true, customers: ["Zero To Mastery", "NASA", "SpaceX"] });
-    launches.set(latestFlightNumber, newLauch);
+const getLatestFlightNumber = async () => {
+    const latestLaunch = await LaunchesModel.findOne({}).sort("-flightNumber");
+    if (!latestLaunch)
+        return DEFAULT_FLIGHT_NUMBER;
+    return latestLaunch["flightNumber"];
 };
-export const existsLaunch = (launchID) => {
-    return launches.has(launchID);
+saveLaunch(launch);
+export const getAllLaunchesModel = async () => {
+    return await LaunchesModel.find({}, {
+        _id: 0,
+        __v: 0,
+    });
 };
-export const abordLaunchByID = (launchID) => {
-    const deletedLaunch = launches.get(launchID);
-    if (!deletedLaunch)
+export const createNewLaunch = async (launch) => {
+    const newFlightNumber = (await getLatestFlightNumber()) + 1;
+    if (!newFlightNumber)
         return;
-    deletedLaunch.upcoming = false;
-    deletedLaunch.success = false;
-    return deletedLaunch;
+    const newLauch = Object.assign(Object.assign({}, launch), { flightNumber: newFlightNumber, success: true, upcoming: true, customers: ["Zero To Mastery", "NASA", "SpaceX"] });
+    await saveLaunch(newLauch);
+};
+export const existsLaunch = async (launchID) => {
+    return await LaunchesModel.findOne({
+        flightNumber: launchID,
+    });
+};
+export const abordLaunchByID = async (launchID) => {
+    const aborted = await LaunchesModel.updateOne({
+        flightNumber: launchID,
+    }, {
+        upcoming: false,
+        success: false,
+    });
+    return aborted;
 };

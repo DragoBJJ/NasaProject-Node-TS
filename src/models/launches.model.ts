@@ -1,4 +1,5 @@
-const launches: Map<number, Launch> = new Map();
+import { LaunchesModel } from "./launches.mongo";
+import { PlanetModel } from "./planets.mongo";
 
 export type Launch = {
   flightNumber: number;
@@ -21,34 +22,72 @@ const launch: Launch = {
   upcoming: true,
   success: true,
 };
-let latestFlightNumber = 100;
 
-launches.set(launch.flightNumber, launch);
+const DEFAULT_FLIGHT_NUMBER = 100;
 
-export const getAllLaunchesModel = () => {
-  return Array.from(launches.values());
+const saveLaunch = async (launch: Launch) => {
+  const planet = await PlanetModel.findOne({
+    keplerName: launch.target,
+  });
+
+  if (!planet) throw new Error("No matching planet found");
+
+  await LaunchesModel.findOneAndUpdate(
+    { flightNumber: launch.flightNumber },
+    launch,
+    {
+      upsert: true,
+    }
+  );
 };
 
-export const createNewLaunch = (launch: Launch) => {
-  latestFlightNumber++;
+const getLatestFlightNumber = async () => {
+  const latestLaunch = await LaunchesModel.findOne({}).sort("-flightNumber");
+  if (!latestLaunch) return DEFAULT_FLIGHT_NUMBER;
+  return latestLaunch["flightNumber"];
+};
+
+saveLaunch(launch);
+
+export const getAllLaunchesModel = async () => {
+  return await LaunchesModel.find(
+    {},
+    {
+      _id: 0,
+      __v: 0,
+    }
+  );
+};
+
+export const createNewLaunch = async (launch: Launch) => {
+  const newFlightNumber = (await getLatestFlightNumber()) + 1;
+  if (!newFlightNumber) return;
   const newLauch = {
     ...launch,
-    flightNumber: latestFlightNumber,
+    flightNumber: newFlightNumber,
     success: true,
     upcoming: true,
     customers: ["Zero To Mastery", "NASA", "SpaceX"],
   };
-  launches.set(latestFlightNumber, newLauch);
+
+  await saveLaunch(newLauch);
 };
 
-export const existsLaunch = (launchID: Launch["flightNumber"]) => {
-  return launches.has(launchID);
+export const existsLaunch = async (launchID: Launch["flightNumber"]) => {
+  return await LaunchesModel.findOne({
+    flightNumber: launchID,
+  });
 };
 
-export const abordLaunchByID = (launchID: Launch["flightNumber"]) => {
-  const deletedLaunch = launches.get(launchID);
-  if (!deletedLaunch) return;
-  deletedLaunch.upcoming = false;
-  deletedLaunch.success = false;
-  return deletedLaunch;
+export const abordLaunchByID = async (launchID: Launch["flightNumber"]) => {
+  const aborted = await LaunchesModel.updateOne(
+    {
+      flightNumber: launchID,
+    },
+    {
+      upcoming: false,
+      success: false,
+    }
+  );
+  return aborted;
 };
