@@ -4,14 +4,17 @@ import app from "./app";
 import dotenv from "dotenv";
 import { connectToDB } from "./services/mongo";
 
+import { PlanetModel } from "./models/planets.mongo";
+import { LaunchesModel } from "./models/launches.mongo";
+
 dotenv.config();
 const server = createServer(app);
 
 const PORT = process.env.PORT || 8000;
 
 const startServer = async () => {
-  await planetsData.loadPlanetsData();
   await connectToDB();
+  await planetsData.loadPlanetsData();
   server.listen(PORT, () => {
     console.log("Hello World");
   });

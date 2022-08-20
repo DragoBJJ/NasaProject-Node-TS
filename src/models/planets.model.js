@@ -21,7 +21,7 @@ const savePlanet = async (planet) => {
         console.log("Error", error);
     }
 };
-const loadPlanetsData = () => {
+const loadPlanetsData = async () => {
     return new Promise((resolve, reject) => {
         fs.createReadStream(path.join(path.resolve(), "..", "server", "data", "kepler_data.csv"))
             .pipe(parse({
@@ -30,11 +30,11 @@ const loadPlanetsData = () => {
         }))
             .on("data", async (data) => {
             if (isHabitablePlanets(data)) {
-                savePlanet(data);
+                await savePlanet(data);
             }
         })
             .on("error", (err) => {
-            console.log("err", err);
+            console.log("Planet Loading Error", err);
             reject(err);
         })
             .on("end", async (result) => {
