@@ -1,3 +1,4 @@
+import { getSpaceXData } from "../utils/getData";
 import { LaunchesModel } from "./launches.mongo";
 import { PlanetModel } from "./planets.mongo";
 const launch = {
@@ -8,7 +9,7 @@ const launch = {
     target: "Kepler-442 b",
     customer: ["ZTM", "NASA"],
     upcoming: true,
-    success: true,
+    success: true, // success
 };
 const DEFAULT_FLIGHT_NUMBER = 100;
 const saveLaunch = async (launch) => {
@@ -20,6 +21,18 @@ const saveLaunch = async (launch) => {
     await LaunchesModel.findOneAndUpdate({ flightNumber: launch.flightNumber }, launch, {
         upsert: true,
     });
+};
+export const loadSpaceXData = async () => {
+    const firstLaunch = await findLaunch({
+        flightNumber: 1,
+        rocket: "Falcon1 ",
+        mission: "FalconSat",
+    });
+    if (firstLaunch) {
+        console.log("First Launch is already exist");
+        return;
+    }
+    const launchData = await getSpaceXData();
 };
 const getLatestFlightNumber = async () => {
     const latestLaunch = await LaunchesModel.findOne({}).sort("-flightNumber");
@@ -41,8 +54,11 @@ export const createNewLaunch = async (launch) => {
     const newLauch = Object.assign(Object.assign({}, launch), { flightNumber: newFlightNumber, success: true, upcoming: true, customers: ["Zero To Mastery", "NASA", "SpaceX"] });
     await saveLaunch(newLauch);
 };
+export const findLaunch = async (filter) => {
+    return await LaunchesModel.findOne(filter);
+};
 export const existsLaunch = async (launchID) => {
-    return await LaunchesModel.findOne({
+    return await findLaunch({
         flightNumber: launchID,
     });
 };
