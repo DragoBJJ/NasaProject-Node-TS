@@ -30,9 +30,9 @@ export const getSpaceXData = async () => {
     console.log("Problem dowloading launch data");
     throw new Error("Launch data dowload failed !");
   }
-  response.data.docs.map((launch: any) => {
+  response.data.docs.forEach((launch: any) => {
     const payloads = launch["payloads"];
-    const customers: string[] = payloads.flatMap((payload: any) => {
+    const customer: string[] = payloads.flatMap((payload: any) => {
       return payload["customers"];
     });
 
@@ -44,8 +44,8 @@ export const getSpaceXData = async () => {
       launchDate: launch["date_local"],
       upcoming: launch["upcoming"],
       success: launch["success"],
-      customers: customers,
+      customer,
     };
-    saveLaunch({ ...launchMissionData });
+    saveLaunch(launchMissionData);
   });
 };

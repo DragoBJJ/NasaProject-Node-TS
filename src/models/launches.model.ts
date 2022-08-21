@@ -9,7 +9,7 @@ export type Launch = {
   launchDate: Date;
   success: boolean;
   target: string;
-  customers: string[];
+  customer: string[];
   upcoming: boolean;
 };
 
@@ -19,7 +19,7 @@ const launch: Launch = {
   rocket: "Explorer IS1", // rocket.name
   launchDate: new Date("December 27, 2030"), //date_local
   target: "Kepler-442 b", // not Applicable
-  customers: ["ZTM", "NASA"], // payload.customers for each payload
+  customer: ["ZTM", "NASA"], // payload.customers for each payload
   upcoming: true, // upcomming
   success: true, // success
 };
