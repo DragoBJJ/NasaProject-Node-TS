@@ -7,10 +7,10 @@ dotenv.config();
 const server = createServer(app);
 const PORT = process.env.PORT || 8000;
 const startServer = async () => {
-  await connectToDB();
-  await planetsData.loadPlanetsData();
-  server.listen(PORT, () => {
-    console.log("Hello World");
-  });
+    await connectToDB();
+    await planetsData.loadPlanetsData();
+    server.listen(PORT, () => {
+        console.log("Hello World");
+    });
 };
 startServer();

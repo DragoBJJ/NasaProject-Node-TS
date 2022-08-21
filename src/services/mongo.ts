@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 export const connectToDB = async () => {
   const DATABASE_URL = process.env.API_DATABASE;
-  console.log("DATABASE_URL", DATABASE_URL);
   if (!DATABASE_URL) return;
   await mongoose.connect(DATABASE_URL);
 

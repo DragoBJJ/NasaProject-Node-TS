@@ -4,9 +4,6 @@ import app from "./app";
 import dotenv from "dotenv";
 import { connectToDB } from "./services/mongo";
 
-import { PlanetModel } from "./models/planets.mongo";
-import { LaunchesModel } from "./models/launches.mongo";
-
 dotenv.config();
 const server = createServer(app);
 
