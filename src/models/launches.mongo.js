@@ -16,10 +16,6 @@ const LaunchSchema = new mongoose.Schema({
         type: String,
         requried: true,
     },
-    target: {
-        type: String,
-        requried: true,
-    },
     upcoming: {
         type: Boolean,
         requried: true,

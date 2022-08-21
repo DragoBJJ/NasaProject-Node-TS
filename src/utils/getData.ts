@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Launch, saveLaunch } from "../models/launches.model";
 
 export const getSpaceXData = async () => {
   const SPACE_X_API_URL = process.env.SPACE_X_API_URL;
@@ -25,22 +26,26 @@ export const getSpaceXData = async () => {
     },
   });
 
-  const launchData = response.data.docs.map((launch: any) => {
+  if (response.status !== 200) {
+    console.log("Problem dowloading launch data");
+    throw new Error("Launch data dowload failed !");
+  }
+  response.data.docs.map((launch: any) => {
     const payloads = launch["payloads"];
-    const customers = payloads.flatMap((payload: any) => {
+    const customers: string[] = payloads.flatMap((payload: any) => {
       return payload["customers"];
     });
 
-    const launchData = {
+    const launchMissionData: Launch = {
       flightNumber: launch["flight_number"],
+      target: "Kepler-62 f",
       mission: launch["name"],
       rocket: launch["rocket"]["name"],
       launchDate: launch["date_local"],
       upcoming: launch["upcoming"],
       success: launch["success"],
-      customers,
+      customers: customers,
     };
-    console.log("launchData", launchData);
-    return launchData;
+    saveLaunch({ ...launchMissionData });
   });
 };

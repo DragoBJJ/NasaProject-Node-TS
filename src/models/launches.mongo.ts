@@ -28,10 +28,6 @@ const LaunchSchema = new mongoose.Schema<Launch>({
     type: String,
     requried: true,
   },
-  target: {
-    type: String,
-    requried: true,
-  },
   upcoming: {
     type: Boolean,
     requried: true,

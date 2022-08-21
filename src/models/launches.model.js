@@ -7,17 +7,12 @@ const launch = {
     rocket: "Explorer IS1",
     launchDate: new Date("December 27, 2030"),
     target: "Kepler-442 b",
-    customer: ["ZTM", "NASA"],
+    customers: ["ZTM", "NASA"],
     upcoming: true,
     success: true, // success
 };
 const DEFAULT_FLIGHT_NUMBER = 100;
-const saveLaunch = async (launch) => {
-    const planet = await PlanetModel.findOne({
-        keplerName: launch.target,
-    });
-    if (!planet)
-        throw new Error("No matching planet found");
+export const saveLaunch = async (launch) => {
     await LaunchesModel.findOneAndUpdate({ flightNumber: launch.flightNumber }, launch, {
         upsert: true,
     });
@@ -25,14 +20,14 @@ const saveLaunch = async (launch) => {
 export const loadSpaceXData = async () => {
     const firstLaunch = await findLaunch({
         flightNumber: 1,
-        rocket: "Falcon1 ",
+        rocket: "Falcon 1",
         mission: "FalconSat",
     });
     if (firstLaunch) {
         console.log("First Launch is already exist");
         return;
     }
-    const launchData = await getSpaceXData();
+    await getSpaceXData();
 };
 const getLatestFlightNumber = async () => {
     const latestLaunch = await LaunchesModel.findOne({}).sort("-flightNumber");
@@ -40,7 +35,6 @@ const getLatestFlightNumber = async () => {
         return DEFAULT_FLIGHT_NUMBER;
     return latestLaunch["flightNumber"];
 };
-saveLaunch(launch);
 export const getAllLaunchesModel = async () => {
     return await LaunchesModel.find({}, {
         _id: 0,
@@ -48,6 +42,11 @@ export const getAllLaunchesModel = async () => {
     });
 };
 export const createNewLaunch = async (launch) => {
+    const planet = await PlanetModel.findOne({
+        keplerName: launch.target,
+    });
+    if (!planet)
+        throw new Error("No matching planet found");
     const newFlightNumber = (await getLatestFlightNumber()) + 1;
     if (!newFlightNumber)
         return;
