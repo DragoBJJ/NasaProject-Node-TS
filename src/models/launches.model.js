@@ -1,16 +1,6 @@
 import { getSpaceXData } from "../utils/getData";
 import { LaunchesModel } from "./launches.mongo";
 import { PlanetModel } from "./planets.mongo";
-const launch = {
-    flightNumber: 100,
-    mission: "Kepler Exploration X",
-    rocket: "Explorer IS1",
-    launchDate: new Date("December 27, 2030"),
-    target: "Kepler-442 b",
-    customer: ["ZTM", "NASA"],
-    upcoming: true,
-    success: true, // success
-};
 const DEFAULT_FLIGHT_NUMBER = 100;
 export const saveLaunch = async (launch) => {
     await LaunchesModel.findOneAndUpdate({ flightNumber: launch.flightNumber }, launch, {
@@ -35,11 +25,13 @@ const getLatestFlightNumber = async () => {
         return DEFAULT_FLIGHT_NUMBER;
     return latestLaunch["flightNumber"];
 };
-export const getAllLaunchesModel = async () => {
+export const getAllLaunchesModel = async (skip, limit) => {
     return await LaunchesModel.find({}, {
         _id: 0,
         __v: 0,
-    });
+    })
+        .skip(skip)
+        .limit(limit);
 };
 export const createNewLaunch = async (launch) => {
     const planet = await PlanetModel.findOne({

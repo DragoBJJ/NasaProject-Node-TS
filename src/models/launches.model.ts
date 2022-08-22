@@ -13,17 +13,6 @@ export type Launch = {
   upcoming: boolean;
 };
 
-const launch: Launch = {
-  flightNumber: 100, // flight_number
-  mission: "Kepler Exploration X", // name
-  rocket: "Explorer IS1", // rocket.name
-  launchDate: new Date("December 27, 2030"), //date_local
-  target: "Kepler-442 b", // not Applicable
-  customer: ["ZTM", "NASA"], // payload.customers for each payload
-  upcoming: true, // upcomming
-  success: true, // success
-};
-
 const DEFAULT_FLIGHT_NUMBER = 100;
 
 export const saveLaunch = async (launch: Launch) => {
@@ -55,14 +44,19 @@ const getLatestFlightNumber = async () => {
   return latestLaunch["flightNumber"];
 };
 
-export const getAllLaunchesModel = async () => {
+export const getAllLaunchesModel = async (skip: number, limit: number) => {
   return await LaunchesModel.find(
     {},
     {
       _id: 0,
       __v: 0,
     }
-  );
+  )
+    .sort({
+      flightNumber: 1,
+    })
+    .skip(skip)
+    .limit(limit);
 };
 
 export const createNewLaunch = async (launch: Launch) => {

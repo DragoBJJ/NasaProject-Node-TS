@@ -6,10 +6,19 @@ import {
   createNewLaunch,
   Launch,
 } from "../../models/launches.model";
+import { getPagination } from "../../services/query";
 import { handleError } from "../../utils";
 
-export const getAllLaunches = async (req: Request, res: Response) => {
-  return res.status(200).json(await getAllLaunchesModel());
+export type RequestQuery = Request & {
+  query: Request["query"] & { page: string; limit: string };
+};
+
+export const getAllLaunches = async (req: RequestQuery, res: Response) => {
+  const { skip, limitPage } = getPagination(req.query);
+  console.log("SKIP", skip);
+  console.log("LIMIT", limitPage);
+  const allLaunches = await getAllLaunchesModel(skip, limitPage);
+  return res.status(200).json(allLaunches);
 };
 
 export const addNewLaunch = async (req: Request, res: Response) => {

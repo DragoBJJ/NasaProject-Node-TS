@@ -1,7 +1,12 @@
 import { getAllLaunchesModel, existsLaunch, abordLaunchByID, createNewLaunch, } from "../../models/launches.model";
+import { getPagination } from "../../services/query";
 import { handleError } from "../../utils";
 export const getAllLaunches = async (req, res) => {
-    return res.status(200).json(await getAllLaunchesModel());
+    const { skip, limitPage } = getPagination(req.query);
+    console.log("SKIP", skip);
+    console.log("LIMIT", limitPage);
+    const allLaunches = await getAllLaunchesModel(skip, limitPage);
+    return res.status(200).json(allLaunches);
 };
 export const addNewLaunch = async (req, res) => {
     const newLaunch = req.body;
