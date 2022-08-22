@@ -3,8 +3,6 @@ import { getPagination } from "../../services/query";
 import { handleError } from "../../utils";
 export const getAllLaunches = async (req, res) => {
     const { skip, limitPage } = getPagination(req.query);
-    console.log("SKIP", skip);
-    console.log("LIMIT", limitPage);
     const allLaunches = await getAllLaunchesModel(skip, limitPage);
     return res.status(200).json(allLaunches);
 };

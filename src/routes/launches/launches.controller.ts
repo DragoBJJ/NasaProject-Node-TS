@@ -15,8 +15,6 @@ export type RequestQuery = Request & {
 
 export const getAllLaunches = async (req: RequestQuery, res: Response) => {
   const { skip, limitPage } = getPagination(req.query);
-  console.log("SKIP", skip);
-  console.log("LIMIT", limitPage);
   const allLaunches = await getAllLaunchesModel(skip, limitPage);
   return res.status(200).json(allLaunches);
 };
